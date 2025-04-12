@@ -1,7 +1,14 @@
 import { Outlet } from "react-router-dom";
 import './Layout.css'
+import { useState } from "react";
 
 export default function Layout() {
+    const [login, setLogin] = useState("");
+    const [password, setPassword] = useState("");
+
+    const authClick = () => {
+        console.log(login, password);
+    };
 
     return <>
     <header>
@@ -46,5 +53,35 @@ export default function Layout() {
         </div>
     </footer>
 
+    <div className="modal fade" id="authModal" tabIndex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+        <div className="modal-dialog">
+            <div className="modal-content">
+                <div className="modal-header">
+                    <h1 className="modal-title fs-5" id="authModalLabel">Автентифікація</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div className="modal-body">
+                    <form id="auth-modal-form">
+                        <div className="input-group mb-3">
+                            <span className="input-group-text" id="AuthLogin-addon"><i className="bi bi-box-arrow-in-right"></i></span>
+                            <input type="text" className="form-control" placeholder="AuthLogin"
+                                value={login} onChange={e => setLogin(e.target.value)}
+                                aria-label="AuthLogin" aria-describedby="AuthLogin-addon"/>
+                        </div>
+                        <div className="input-group mb-3">
+                            <span className="input-group-text" id="AuthPassword-addon"><i className="bi bi-key"></i></span>
+                            <input type="password" className="form-control" placeholder="AuthPassword"
+                                value={password} onChange={e => setPassword(e.target.value)}
+                                aria-label="AuthPassword" aria-describedby="AuthPassword-addon"/>
+                        </div>
+                    </form>
+                </div>
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                    <button type="button" onClick={authClick} className="btn btn-primary">Вхід</button>
+                </div>
+            </div>
+        </div>
+    </div>
     </>;
 }
