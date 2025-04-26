@@ -1,13 +1,27 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import './Layout.css'
-import { useState } from "react";
+import { useContext, useRef, useState } from "react";
+import { AppContext } from "../../AppContext";
 
 export default function Layout() {
     const [login, setLogin] = useState("");
     const [password, setPassword] = useState("");
+    const {request, token, setToken} = useContext(AppContext);
+    const closeModalRef = useRef();
 
     const authClick = () => {
-        console.log(login, password);
+        let credentials = btoa(`${login}:${password}`);
+        request("/api/user",{
+            method: 'GET',
+            headers: {
+                'Authorization': 'Basic ' + credentials
+            }
+        }).then(data => {
+            let jti = data;  // .jti;
+            setToken(jti);
+            closeModalRef.current.click();
+        })
+        .catch(console.error);
     };
 
     return <>
@@ -28,13 +42,22 @@ export default function Layout() {
                             <a className="nav-link text-dark" >Privacy</a>
                         </li>
                     </ul>
-                    
+                    {token == null ? <>
                         <span className="nav-link text-dark cursor-pointer" 
                         data-bs-toggle="modal" data-bs-target="#authModal">
                             Sign In
                         </span>
-
-                        <a className="nav-link text-dark" >Sign Up</a>
+                        &emsp;
+                        <Link to="/signup" className="nav-link text-dark" >Sign Up</Link>
+                    </>
+                    : <>
+                        <Link to="/profile" className="nav-link text-dark" >Profile</Link>
+                        &emsp;
+                        <span className="nav-link text-dark cursor-pointer"
+                        title={token} onClick={() => setToken(null)}>
+                            Log out
+                        </span>
+                    </>}
                     
                 </div>
             </div>
@@ -77,7 +100,7 @@ export default function Layout() {
                     </form>
                 </div>
                 <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
+                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" ref={closeModalRef}>Скасувати</button>
                     <button type="button" onClick={authClick} className="btn btn-primary">Вхід</button>
                 </div>
             </div>
